@@ -11,8 +11,23 @@ const ADD_BOOK = gql`
   }
 `;
 
+const BOOKS = gql`
+  query {
+    books {
+      title
+      author
+    }
+    movies {
+      title
+      director
+    }
+  }
+`;
+
 export default function Update() {
-  const [addBook, { data, loading, error }] = useMutation(ADD_BOOK);
+  const [addBook, { data, loading, error }] = useMutation(ADD_BOOK, {
+    refetchQueries: [{ query: BOOKS }],
+  });
   const [title, setTitle] = useState<string>("");
   const [author, setAuthor] = useState<string>("");
 
