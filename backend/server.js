@@ -23,6 +23,8 @@ const typeDefs = gql`
   type Mutation {
     addBook(id: Int, title: String, author: String): Book
     addMovie(id: Int, title: String, director: String, release: Int): Movie
+    deleteBook(id: Int!): Book
+    updateBook(id: Int, title: String, author: String): Book
   }
 `;
 
@@ -73,6 +75,25 @@ const resolvers = {
       const newMovie = { id: nextMovieId++, title, director, release };
       movies.push(newMovie);
       return newMovie;
+    },
+    deleteBook: (_, { id }) => {
+      const bookIndex = books.findIndex((book) => book.id === id);
+      if (bookIndex === -1) throw new Error("Book not found");
+      const deletedBooks = books.splice(bookIndex, 1);
+      return deletedBooks[0];
+    },
+    updateBook: (_, { id, title, author }) => {
+      const bookIndex = books.findIndex((book) => book.id === id);
+      if (bookIndex === -1) throw new Error("Book not found");
+
+      const updatedBook = { ...books[bookIndex] };
+
+      if (title !== undefined) updatedBook.title = title;
+      if (author !== undefined) updatedBook.author = author;
+
+      books[bookIndex] = updatedBook;
+
+      return updatedBook;
     },
   },
 };

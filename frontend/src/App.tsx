@@ -1,14 +1,12 @@
 import "./App.css";
-import Delete from "./components/Delete";
-import Get from "./components/Get";
-import Update from "./components/Update";
+import Read from "./components/Read";
+import Create from "./components/Create";
 
 function App() {
   return (
     <div className="App">
-      <Get />
-      <Update />
-      <Delete />
+      <Read />
+      <Create />
     </div>
   );
 }

@@ -1,10 +1,13 @@
 import { gql, useQuery } from "@apollo/client";
+import Delete from "./Delete";
+import Update from "./Update";
 
-const BOOKS = gql`
+export const BOOKS = gql`
   query {
     books {
       title
       author
+      id
     }
     movies {
       title
@@ -13,7 +16,7 @@ const BOOKS = gql`
   }
 `;
 
-function Get() {
+function Read() {
   const { loading, error, data } = useQuery(BOOKS);
 
   if (loading) return <p>로딩중!</p>;
@@ -22,15 +25,26 @@ function Get() {
     <>
       <h2>데이터 불러오기(Get)</h2>
       {data.books.map(
-        ({ title, author }: { title: string; author: string }) => (
-          <div key={title}>
+        ({
+          title,
+          author,
+          id,
+        }: {
+          title: string;
+          author: string;
+          id: number;
+        }) => (
+          <div key={title} className="book">
             <p>
               {author} : {title}
             </p>
+            <Delete id={id} />
+
+            <Update id={id} />
           </div>
         )
       )}
-      {data.movies.map(
+      {/* {data.movies.map(
         ({ title, director }: { title: string; director: string }) => (
           <div key={title}>
             <p>
@@ -38,9 +52,9 @@ function Get() {
             </p>
           </div>
         )
-      )}
+      )} */}
     </>
   );
 }
 
-export default Get;
+export default Read;

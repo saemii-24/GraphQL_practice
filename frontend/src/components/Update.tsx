@@ -1,9 +1,13 @@
-import { useMutation, gql } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { gql, useMutation } from "@apollo/client";
+import { BOOKS } from "./Read";
 
-const ADD_BOOK = gql`
-  mutation AddBook($title: String, $author: String) {
-    addBook(title: $title, author: $author) {
+//UPDATE_BOOK = 뮤테이션 정의
+const UPDATE_BOOK = gql`
+  # UpdateBook = 뮤테이션 이름 (서버에서 뮤테이션 식별)
+  mutation UpdateBook($id: Int!, $title: String, $author: String) {
+    # updateBook = 정의한 뮤테이션 함수의 이름
+    updateBook(id: $id, title: $title, author: $author) {
       id
       title
       author
@@ -11,64 +15,42 @@ const ADD_BOOK = gql`
   }
 `;
 
-const BOOKS = gql`
-  query {
-    books {
-      title
-      author
-    }
-    movies {
-      title
-      director
-    }
-  }
-`;
+export default function Update({ id }: { id: number }) {
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
 
-export default function Update() {
-  const [addBook, { data, loading, error }] = useMutation(ADD_BOOK, {
+  const [updateBook, { error }] = useMutation(UPDATE_BOOK, {
+    variables: { id, title, author },
+    onCompleted: () => {
+      alert("책이 업데이트 되었습니다.");
+    },
     refetchQueries: [{ query: BOOKS }],
   });
-  const [title, setTitle] = useState<string>("");
-  const [author, setAuthor] = useState<string>("");
 
-  useEffect(() => {
-    if (error) {
-      console.error("Error adding book:", error);
-    }
-    if (data) {
-      console.log("Book added:", data);
-    }
-  }, [data, error]);
+  if (error) alert(`업데이트 실패: ${error.message}`);
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (title && author) {
-          addBook({
-            variables: { title, author },
-          }).catch((e) => {
-            console.error("Error in submission:", e);
-          });
-          setTitle(""); // 입력 필드를 초기화합니다.
-          setAuthor(""); // 입력 필드를 초기화합니다.
-        }
-      }}
-    >
-      <input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="책 제목"
-      />
-      <input
-        value={author}
-        onChange={(e) => setAuthor(e.target.value)}
-        placeholder="작가"
-      />
-      <button type="submit" disabled={loading}>
-        추가하기
-      </button>
-      {loading && <p>추가 중...</p>}
-    </form>
+    <div className="update">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          updateBook();
+        }}
+      >
+        <input
+          type="text"
+          placeholder="작가"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="책 제목"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <button type="submit">수정하기</button>
+      </form>
+    </div>
   );
 }
